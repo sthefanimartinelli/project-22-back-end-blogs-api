@@ -20,4 +20,14 @@ const createUser = async (req, res) => {
   return res.status(201).json({ token });
 };
 
-module.exports = { createUser };
+const getAllUsers = async (_req, res) => {
+  // try {
+    const users = await userService.getAllUsers();
+    return res.status(200).json(users);
+  // } catch (error) {
+  //   console.log(error.message);
+  //   return res.status(500).json({ message: 'An error has occurred' });
+  // }
+};
+
+module.exports = { createUser, getAllUsers };

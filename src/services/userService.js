@@ -13,4 +13,9 @@ const createUser = async (req) => {
   return newUser;
 };
 
-module.exports = { getUserByEmail, createUser };
+const getAllUsers = async () => {
+  const users = User.findAll();
+  return users;
+};
+
+module.exports = { getUserByEmail, createUser, getAllUsers };

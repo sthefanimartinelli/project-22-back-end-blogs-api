@@ -21,13 +21,18 @@ const createUser = async (req, res) => {
 };
 
 const getAllUsers = async (_req, res) => {
-  // try {
+  try {
     const users = await userService.getAllUsers();
-    return res.status(200).json(users);
-  // } catch (error) {
-  //   console.log(error.message);
-  //   return res.status(500).json({ message: 'An error has occurred' });
-  // }
+    const usersWithoutPassword = users.map((user) => {
+      const { id, displayName, email, image } = user;
+      return { id, displayName, email, image };
+    });
+
+    return res.status(200).json(usersWithoutPassword);
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({ message: 'An error has occurred' });
+  }
 };
 
 module.exports = { createUser, getAllUsers };

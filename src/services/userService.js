@@ -1,7 +1,7 @@
 const { User } = require('../models');
 
-const getUserByEmail = async (email) => {
-  const user = await User.findOne({ where: { email } });
+const getUserByEmail = async (emailPassed) => {
+  const user = await User.findOne({ where: { email: emailPassed } });
 
   return user;
 };

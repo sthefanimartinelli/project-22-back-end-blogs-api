@@ -9,7 +9,6 @@ const getUserByEmail = async (emailPassed) => {
 const createUser = async (req) => {
   const { displayName, email, password, image } = req.body;
   const newUser = await User.create({ displayName, email, password, image });
-
   return newUser;
 };
 

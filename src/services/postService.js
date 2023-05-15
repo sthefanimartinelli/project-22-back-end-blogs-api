@@ -1,7 +1,7 @@
 // const Sequelize = require('sequelize');
 // const { now } = require('sequelize/types/utils');
 // const config = require('../config/config');
-const { Category, BlogPost, PostCategory } = require('../models');
+const { Category, BlogPost, PostCategory, User } = require('../models');
 
 // const env = process.env.NODE_ENV;
 
@@ -38,4 +38,18 @@ const createPost = async (title, content, categoryIds, userId) => {
   return newPost;
 };
 
-module.exports = { createPost };
+// const getAllPosts = async () => {
+//   const posts = await BlogPost.findAll({
+//     include: [{ model: User, as: 'users', through: { attributes: [] } }],
+//   });
+//   return posts;
+// };
+
+const getAllPosts = () => BlogPost.findAll(
+  {
+    include: [{ model: User, as: 'user', attributes: { exclude: ['password'] } },
+    { model: Category, as: 'categories', through: { attributes: [] } }],
+  },
+);
+
+module.exports = { createPost, getAllPosts };

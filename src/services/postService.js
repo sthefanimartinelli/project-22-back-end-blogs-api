@@ -20,7 +20,6 @@ const createPost = async (title, content, categoryIds, userId) => {
     return { type: 400, message: 'one or more "categoryIds" not found' };
   }
 
-  console.log(categoriesIds);
   for (let index = 0; index < categoryIds.length; index += 1) {
     if (!categoriesIds.includes(categoryIds[index])) {
       return { type: 400, message: 'one or more "categoryIds" not found' };
@@ -38,13 +37,6 @@ const createPost = async (title, content, categoryIds, userId) => {
   return newPost;
 };
 
-// const getAllPosts = async () => {
-//   const posts = await BlogPost.findAll({
-//     include: [{ model: User, as: 'users', through: { attributes: [] } }],
-//   });
-//   return posts;
-// };
-
 const getAllPosts = () => BlogPost.findAll(
   {
     include: [{ model: User, as: 'user', attributes: { exclude: ['password'] } },
@@ -52,4 +44,11 @@ const getAllPosts = () => BlogPost.findAll(
   },
 );
 
-module.exports = { createPost, getAllPosts };
+const getByPostId = (id) => BlogPost.findOne(
+  { where: { id },
+    include: [{ model: User, as: 'user', attributes: { exclude: ['password'] } },
+    { model: Category, as: 'categories', through: { attributes: [] } }],
+  },
+);
+
+module.exports = { createPost, getAllPosts, getByPostId };

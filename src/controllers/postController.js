@@ -17,11 +17,22 @@ const getAllPosts = async (req, res) => {
 
 const getPostById = async (req, res) => {
   const { id } = req.params;
-  console.log(id);
   const post = await postService.getByPostId(id);
   
   if (!post) return res.status(404).json({ message: 'Post does not exist' });
   return res.status(200).json(post);
 };
 
-module.exports = { createPost, getAllPosts, getPostById };
+const updatePost = async (req, res) => {
+  const { id: postId } = req.params;
+  const userLogged = req.user;
+  const userId = userLogged.dataValues.id;
+
+  const { title, content } = req.body;
+  const post = await postService.updatePost(postId, userId, title, content);
+
+  if (post.type) return res.status(post.type).json({ message: post.message });
+  return res.status(200).json(post);
+};
+
+module.exports = { createPost, getAllPosts, getPostById, updatePost };

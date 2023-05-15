@@ -37,18 +37,32 @@ const createPost = async (title, content, categoryIds, userId) => {
   return newPost;
 };
 
-const getAllPosts = () => BlogPost.findAll(
-  {
-    include: [{ model: User, as: 'user', attributes: { exclude: ['password'] } },
-    { model: Category, as: 'categories', through: { attributes: [] } }],
-  },
+const getAllPosts = async () => {
+  const posts = await BlogPost.findAll(
+    {
+      include: [{ model: User, as: 'user', attributes: { exclude: ['password'] } },
+      { model: Category, as: 'categories', through: { attributes: [] } }],
+    },
 );
+    return posts;
+};
 
-const getByPostId = (id) => BlogPost.findOne(
-  { where: { id },
-    include: [{ model: User, as: 'user', attributes: { exclude: ['password'] } },
-    { model: Category, as: 'categories', through: { attributes: [] } }],
-  },
-);
+const getByPostId = async (id) => {
+  const post = await BlogPost.findOne(
+    { where: { id },
+      include: [{ model: User, as: 'user', attributes: { exclude: ['password'] } },
+      { model: Category, as: 'categories', through: { attributes: [] } }],
+    },
+  );
+  return post;
+};
 
-module.exports = { createPost, getAllPosts, getByPostId };
+const updatePost = async (postId, userId, title, content) => {
+  const post = await getByPostId(postId);
+  if (post.userId !== userId) return { type: 401, message: 'Unauthorized user' };
+  await BlogPost.update({ title, content }, { where: { id: postId } });
+  const updatedPost = await getByPostId(postId);
+  return updatedPost;
+};
+
+module.exports = { createPost, getAllPosts, getByPostId, updatePost };

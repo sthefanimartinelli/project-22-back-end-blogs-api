@@ -11,7 +11,7 @@ module.exports = {
           key: 'id',
         },
         onUpdate: 'CASCADE',
-        odDelete: 'CASCADE',
+        onDelete: 'CASCADE',
         primaryKey: true,
       },
       categoryId: {
@@ -22,7 +22,7 @@ module.exports = {
           key: 'id',
         },
         onUpdate: 'CASCADE',
-        odDelete: 'CASCADE',
+        onDelete: 'CASCADE',
         primaryKey: true,
       },
     }); 

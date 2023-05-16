@@ -22,4 +22,8 @@ const getUserById = async (id) => {
   return user;
 };
 
-module.exports = { getUserByEmail, createUser, getAllUsers, getUserById };
+const deleteUser = async (userId) => {
+  await User.destroy({ where: { id: userId } });
+};
+
+module.exports = { getUserByEmail, createUser, getAllUsers, getUserById, deleteUser };

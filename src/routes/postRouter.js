@@ -6,6 +6,8 @@ const { validateAlterPostFields } = require('../middlewares/validateAlterPostFie
 
 const router = express.Router();
 
+router.get('/search', validateToken, postController.searchPost);
+
 router.post('/', validateToken, validatePostFields, postController.createPost);
 
 router.get('/', validateToken, postController.getAllPosts);

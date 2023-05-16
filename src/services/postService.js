@@ -1,6 +1,7 @@
 // const Sequelize = require('sequelize');
 // const { now } = require('sequelize/types/utils');
 // const config = require('../config/config');
+const { Op } = require('sequelize');
 const { Category, BlogPost, PostCategory, User } = require('../models');
 
 // const env = process.env.NODE_ENV;
@@ -73,4 +74,15 @@ const deletePost = async (postId, userId) => {
   return { type: null, message: '' };
 };
 
-module.exports = { createPost, getAllPosts, getByPostId, updatePost, deletePost };
+const searchPost = async (q) => {
+  const search = await BlogPost.findAll({
+    where: {
+      [Op.or]: [{ title: { [Op.like]: `%${q}%` } }, { content: { [Op.like]: `%${q}%` } }],
+    },
+    include: [{ model: User, as: 'user', attributes: { exclude: ['password'] } },
+      { model: Category, as: 'categories', through: { attributes: [] } }], 
+  });
+  return search;
+};
+
+module.exports = { createPost, getAllPosts, getByPostId, updatePost, deletePost, searchPost };

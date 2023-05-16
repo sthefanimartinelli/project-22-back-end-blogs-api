@@ -4,7 +4,7 @@ const createCategory = async (req, res) => {
   const { name } = req.body;
   const category = await categoryService.createCategory(name);
 
-  return res.status(201).json({ ...category.dataValues });
+  return res.status(201).json(category);
 };
 
 const getAllCategories = async (_req, res) => {

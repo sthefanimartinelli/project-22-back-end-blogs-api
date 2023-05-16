@@ -1,19 +1,18 @@
-// const Sequelize = require('sequelize');
-// const { now } = require('sequelize/types/utils');
-// const config = require('../config/config');
+const Sequelize = require('sequelize');
 const { Op } = require('sequelize');
+const config = require('../config/config');
 const { Category, BlogPost, PostCategory, User } = require('../models');
 
-// const env = process.env.NODE_ENV;
+const env = process.env.NODE_ENV;
 
-// const sequelize = new Sequelize(config[env]);
+const sequelize = new Sequelize(config[env]);
 
-const createPostCategories = async (postId, categoryIds) => {
-  const newArray = categoryIds.map((categoryId) => ({ postId, categoryId }));
-  await PostCategory.bulkCreate(newArray);
-};
+// const createPostCategories = async (postId, categoryIds) => {
+//   const newArray = categoryIds.map((categoryId) => ({ postId, categoryId }));
+//   await PostCategory.bulkCreate(newArray);
+// };
 
-const createPost = async (title, content, categoryIds, userId) => {
+const verifyCategories = async (categoryIds) => {
   const allCategories = await Category.findAll();
   const categoriesIds = allCategories.map((category) => category.id);
 
@@ -26,23 +25,44 @@ const createPost = async (title, content, categoryIds, userId) => {
       return { type: 400, message: 'one or more "categoryIds" not found' };
     }
   }
+};
 
+// const createPost = async (title, content, categoryIds, userId) => {
+//   await verifyCategories(categoryIds);
+//   const now = new Date();
+//   const newPost = await BlogPost
+//     .create({ title, content, userId, published: now.toISOString(), updated: now.toISOString() });
+//   const postId = newPost.id;
+//   await createPostCategories(postId, categoryIds);
+//   return newPost;
+// };
+
+const createPost = async (title, content, categoryIds, userId) => {
+  const categoriesNotOk = await verifyCategories(categoryIds);
+  if (categoriesNotOk) return categoriesNotOk;
   const now = new Date();
+  const result = await sequelize.transaction(async (t) => {
+    const newPost = await BlogPost.create({ 
+      title, content, userId, published: now.toISOString(), updated: now.toISOString(),
+    }, { transaction: t });
+    
+    const postId = newPost.id;
+    const newArray = categoryIds.map((categoryId) => ({ postId, categoryId }));
+    await PostCategory.bulkCreate(newArray, { transaction: t });
 
-  const newPost = await BlogPost
-    .create({ title, content, userId, published: now.toISOString(), updated: now.toISOString() });
-
-  const postId = newPost.id;
-  await createPostCategories(postId, categoryIds);
-
-  return newPost;
+    return newPost;
+  });
+  
+  return result;
 };
 
 const getAllPosts = async () => {
   const posts = await BlogPost.findAll(
     {
-      include: [{ model: User, as: 'user', attributes: { exclude: ['password'] } },
-      { model: Category, as: 'categories', through: { attributes: [] } }],
+      include: [
+      { model: User, as: 'user', attributes: { exclude: ['password'] } },
+      { model: Category, as: 'categories', through: { attributes: [] } },
+    ],
     },
 );
     return posts;
@@ -51,8 +71,10 @@ const getAllPosts = async () => {
 const getByPostId = async (id) => {
   const post = await BlogPost.findOne(
     { where: { id },
-      include: [{ model: User, as: 'user', attributes: { exclude: ['password'] } },
-      { model: Category, as: 'categories', through: { attributes: [] } }],
+      include: [
+      { model: User, as: 'user', attributes: { exclude: ['password'] } },
+      { model: Category, as: 'categories', through: { attributes: [] } },
+    ],
     },
   );
   return post;
@@ -79,8 +101,10 @@ const searchPost = async (q) => {
     where: {
       [Op.or]: [{ title: { [Op.like]: `%${q}%` } }, { content: { [Op.like]: `%${q}%` } }],
     },
-    include: [{ model: User, as: 'user', attributes: { exclude: ['password'] } },
-      { model: Category, as: 'categories', through: { attributes: [] } }], 
+    include: [
+      { model: User, as: 'user', attributes: { exclude: ['password'] } },
+      { model: Category, as: 'categories', through: { attributes: [] } },
+    ], 
   });
   return search;
 };

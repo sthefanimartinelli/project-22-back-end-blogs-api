@@ -26,7 +26,7 @@ const getPostById = async (req, res) => {
 const updatePost = async (req, res) => {
   const { id: postId } = req.params;
   const userLogged = req.user;
-  const userId = userLogged.dataValues.id;
+  const userId = userLogged.id;
 
   const { title, content } = req.body;
   const post = await postService.updatePost(postId, userId, title, content);

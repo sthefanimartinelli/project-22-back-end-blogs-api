@@ -1,8 +1,7 @@
 # :computer::blue_book: Blogs API
 
 ### About
-- This project was developed during the backend module of Trybe Web Development Course.
-- The main goal was to develop a REST API, with a CRUD to manage users and their posts on a blog. A SQL database was also developed, using Sequelize as ORM.
+- The main goal of this project was to develop a REST API, with a CRUD to manage users and their posts on a blog. A SQL database was also developed, using Sequelize as ORM.
 - Authentication of users and search of blog posts were also developed.
 
 ### Technologies used
